@@ -180,6 +180,10 @@
             font-family: inherit;
             opacity: 0;
             transition: opacity 0.8s ease-in-out;
+            width: auto;
+            min-width: 150px;
+            text-align: center;
+            z-index: 100;
         }
 
         .start-button:hover {
@@ -189,7 +193,7 @@
 
         .start-button.visible {
             opacity: 1;
-        }
+}
 
         .fullscreen-text {
             position: fixed;
@@ -303,6 +307,22 @@
                 font-size: 1.1rem;
                 word-break: break-word;
             }
+
+            .start-button {
+                width: 80%;
+                max-width: 200px;
+                padding: 0.8rem 1rem;
+                font-size: 1.1rem;
+                top: 70%; /* Adjusted position for mobile */
+                background: rgba(147, 112, 219, 0.4); /* Slightly more visible on mobile */
+                -webkit-tap-highlight-color: transparent; /* Remove tap highlight on iOS */
+            }
+
+            /* Adjust hover state for touch devices */
+            .start-button:active {
+                background: rgba(147, 112, 219, 0.6);
+                transform: translate(-50%, -50%) scale(0.98);
+            }
         }
 
         /* Additional optimization for very small screens */
@@ -319,6 +339,12 @@
             .experience-text,
             .fullscreen-text {
                 font-size: 1rem;
+            }
+
+            .start-button {
+                width: 90%;
+                font-size: 1rem;
+                padding: 0.7rem 1rem;
             }
         }
 
@@ -340,6 +366,12 @@
 
             input {
                 width: 80px;
+            }
+
+            .start-button {
+                top: 75%;
+                padding: 0.6rem 1.5rem;
+                font-size: 1rem;
             }
         }
 
