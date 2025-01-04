@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Life Stats</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital@1&display=swap" rel="stylesheet">
+    <style>
+        /* Base styles remain the same */
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #000000 0%, #000033 50%, #000000 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Space Mono', monospace;
+            font-style: italic;
+            color: white;
+        }
+
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 1s infinite alternate;
+        }
+
+        @keyframes twinkle {
+            0% { opacity: 0.2; }
+            100% { opacity: 1; }
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2.5rem;
+            border-radius: 15px;
+            backdrop-filter: blur(5px);
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        h1 { font-size: 2.5rem; margin: 0 0 0.5rem 0; }
+        h2 { font-size: 1.3rem; margin: 0 0 0.5rem 0; opacity: 0.8; }
+        h3 { font-size: .9rem; margin: 0 0 1.5rem 1; opacity: 0.7; }
+
+        .input-group {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        input {
+            width: 60px;
+            padding: 8px;
+            background: transparent;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 5px;
+            color: white;
+            font-size: 1.2rem;
+            text-align: center;
+            font-family: inherit;
+        }
+
+        button {
+            background: rgba(147, 112, 219, 0.3);
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            font-size: 1.2rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        button:hover {
+            background: rgba(147, 112, 219, 0.5);
+            transform: scale(1.05);
+        }
+
+        .container.fade-out {
+            opacity: 0;
+            transform: translateY(-50px);
+            pointer-events: none;
+            transition: all 1s ease-out;
+        }
+
+        .experience-text {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            font-size: 1.5rem;
+            opacity: 0;
+            transition: opacity 2s ease-in;
+            z-index: 2;
+        }
+
+        .experience-text.visible {
+            opacity: 1;
+        }
+
+        .credit {
+            position: fixed;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.401);
+            font-size: 1rem;
+            z-index: 100;
+        }
+
+        .story-text {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            font-size: 1.5rem;
+            width: 80%;
+            max-width: 800px;
+            opacity: 0;
+            transition: opacity 0.8s ease-in-out;
+            z-index: 2;
+        }
+
+        .story-text.visible {
+            opacity: 1;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        .typing {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .fadeOut {
+            animation: fadeOut 0.5s ease-in-out forwards;
+        }
+
+        .number {
+            color: #2a74ff;
+            font-weight: bold;
+        }
+
+        .start-button {
+            position: fixed;
+            top: 60%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(147, 112, 219, 0.3);
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            font-size: 1.2rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-family: inherit;
+            opacity: 0;
+            transition: opacity 0.8s ease-in-out;
+        }
+
+        .start-button:hover {
+            background: rgba(147, 112, 219, 0.5);
+            transform: translate(-50%, -50%) scale(1.05);
+        }
+
+        .start-button.visible {
+            opacity: 1;
+        }
+
+        .fullscreen-text {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            font-size: 1.5rem;
+            opacity: 0;
+            transition: opacity 0.8s ease-in-out;
+            z-index: 2;
+            line-height: 2;
+        }
+
+        .fullscreen-text.visible {
+            opacity: 1;
+        }
+
+        /* Mobile-specific styles */
+        @media screen and (max-width: 768px) {
+            /* Adjust container size and padding */
+            .container {
+                padding: 1.5rem;
+                width: 85%;
+                max-width: 100%;
+                margin: 1rem;
+            }
+
+            /* Adjust font sizes */
+            h1 { 
+                font-size: 1.8rem; 
+                margin-bottom: 0.3rem;
+            }
+            
+            h2 { 
+                font-size: 1rem;
+                margin-bottom: 0.3rem;
+            }
+            
+            h3 { 
+                font-size: 0.8rem;
+                margin-bottom: 1rem;
+            }
+
+            /* Make input group stack on mobile */
+            .input-group {
+                flex-direction: column;
+                gap: 0.5rem;
+                margin-bottom: 1.5rem;
+            }
+
+            /* Adjust input fields */
+            input {
+                width: 100%;
+                max-width: 200px;
+                margin: 0 auto;
+                font-size: 1rem;
+                padding: 0.5rem;
+            }
+
+            /* Adjust button size */
+            button {
+                padding: 0.6rem 1.5rem;
+                font-size: 1rem;
+                width: 100%;
+                max-width: 200px;
+            }
+
+            /* Adjust text sizes for story */
+            .story-text {
+                font-size: 1.2rem;
+                width: 90%;
+                padding: 0 1rem;
+            }
+
+            /* Adjust experience text */
+            .experience-text {
+                font-size: 1.2rem;
+                width: 90%;
+                padding: 0 1rem;
+            }
+
+            /* Adjust fullscreen text */
+            .fullscreen-text {
+                font-size: 1.2rem;
+                width: 90%;
+                padding: 0 1rem;
+            }
+
+            /* Adjust start button */
+            .start-button {
+                font-size: 1rem;
+                padding: 0.6rem 1.5rem;
+                width: 80%;
+                max-width: 200px;
+            }
+
+            /* Adjust credit text position */
+            .credit {
+                top: 5px;
+                font-size: 0.8rem;
+            }
+
+            /* Optimize animations for mobile */
+            .container.fade-out {
+                transform: translateY(-30px);
+            }
+
+            /* Adjust number display */
+            .number {
+                font-size: 1.1rem;
+                word-break: break-word;
+            }
+        }
+
+        /* Additional optimization for very small screens */
+        @media screen and (max-width: 320px) {
+            .container {
+                padding: 1rem;
+            }
+
+            h1 { 
+                font-size: 1.5rem; 
+            }
+
+            .story-text,
+            .experience-text,
+            .fullscreen-text {
+                font-size: 1rem;
+            }
+        }
+
+        /* Handle landscape orientation */
+        @media screen and (max-height: 500px) and (orientation: landscape) {
+            .container {
+                margin: 0.5rem;
+                padding: 1rem;
+            }
+
+            h1 { 
+                font-size: 1.5rem; 
+            }
+
+            .input-group {
+                flex-direction: row;
+                gap: 0.5rem;
+            }
+
+            input {
+                width: 80px;
+            }
+        }
+
+        /* Improve touch targets */
+        @media (hover: none) and (pointer: coarse) {
+            button,
+            input,
+            .start-button {
+                min-height: 44px; /* Minimum touch target size */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="credit">alvin.fun</div>
+    <div class="stars"></div>
+
+    <main class="container" id="inputContainer">
+        <h1>Fun Life Stats</h1>
+        <h2>Short Animation</h2>
+        <h3>Enter your Date of Birth</h3>
+        
+        <div class="input-group">
+            <input type="number" min="1" max="31" placeholder="DD" id="day">
+            <input type="number" min="1" max="12" placeholder="MM" id="month">
+            <input type="number" min="1900" max="2100" placeholder="YYYY" id="year">
+        </div>
+        
+        <button id="goButton">GO</button>
+    </main>
+
+    <audio id="backgroundMusic" preload="auto">
+        <source src="inspiration.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="experience-text" id="experienceText">
+        🎧 Wear Headphones for the Best Experience 🎧<br><br>
+    </div>
+    <div class="start-button" id="startButton">Start</div>
+    <div class="fullscreen-text" id="fullscreenText"></div>
+
+    <div class="story-text" id="storyText"></div>
+
+    <script>
+        // Create stars function remains the same
+        function createStars() {
+            const starsContainer = document.querySelector('.stars');
+            for (let i = 0; i < 200; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.width = Math.random() * 3 + 'px';
+                star.style.height = star.style.width;
+                star.style.animationDelay = Math.random() * 3 + 's';
+                starsContainer.appendChild(star);
+            }
+        }
+        createStars();
+
+        // Get elements
+        const inputs = {
+            day: document.getElementById('day'),
+            month: document.getElementById('month'),
+            year: document.getElementById('year')
+        };
+
+        // Input validation remains the same
+        Object.values(inputs).forEach(input => {
+            input.addEventListener('input', (e) => {
+                e.target.value = e.target.value.replace(/\D/g, '');
+                if (e.target.id === 'day' && parseInt(e.target.value) > 31) {
+                    e.target.value = '31';
+                }
+                if (e.target.id === 'month' && parseInt(e.target.value) > 12) {
+                    e.target.value = '12';
+                }
+            });
+        });
+
+        // Constants
+        const HEART_BEATS_PER_DAY = 100000;
+        const BREATHS_PER_DAY = 20000;
+        const BLINKS_PER_DAY = 28800;
+        const BLOOD_PUMPED_PER_DAY = 7200;
+        const RED_BLOOD_CELLS_PER_DAY = 200000000000;
+        const SLEEP_HOURS_PER_DAY = 8;
+        const EARTH_ORBIT_SPEED = 107280;
+        const TREES_PER_YEAR = 7000000000;
+        const BIRTHS_PER_YEAR = 140000000;
+
+        async function typeText(element, text) {
+        element.innerHTML = '';
+        let currentIndex = 0;
+        const spans = text.split(/(<span.*?<\/span>)/);
+        
+        for (let span of spans) {
+            if (span.startsWith('<span')) {
+                // If it's a span tag, add it instantly
+                element.innerHTML += span;
+            } else {
+                // If it's regular text, type it character by character
+                for (let char of span) {
+                    element.innerHTML += char;
+                    await new Promise(resolve => setTimeout(resolve, 50));
+                }
+            }
+        }
+
+        // Wait for 5 seconds
+        await new Promise(resolve => setTimeout(resolve, 5000));
+        // Fade out
+        element.style.opacity = '0';
+        await new Promise(resolve => setTimeout(resolve, 800));
+    }
+
+    async function fadeInOut(element, text) {
+        element.innerHTML = text; // Changed to innerHTML to support spans
+        element.style.opacity = '0';
+        await new Promise(resolve => setTimeout(resolve, 200));
+        element.style.opacity = '1';
+        await new Promise(resolve => setTimeout(resolve, 5000));
+        element.style.opacity = '0';
+        await new Promise(resolve => setTimeout(resolve, 800));
+    }
+
+    async function startStoryAnimation(birthDate) {
+        const storyText = document.getElementById('storyText');
+        const now = new Date();
+        
+        const timeDiff = now - birthDate;
+        const daysSinceBirth = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+        const yearsSinceBirth = Math.floor(daysSinceBirth / 365.25);
+        const monthsSinceBirth = Math.floor((daysSinceBirth / 30.4));
+        const weeksSinceBirth = Math.floor(daysSinceBirth / 7); 
+        const hoursSinceBirth = Math.floor(timeDiff / (1000 * 60 * 60));
+        const minutesSinceBirth = Math.floor(timeDiff / (1000 * 60));
+        const secondsSinceBirth = Math.floor(timeDiff / 1000);
+
+        // Helper function to wrap numbers in colored span
+        const num = (n) => `<span class="number"> ${n.toLocaleString()} </span>`;
+
+        const storyLines = [
+            `A lot has happened in the ${num(daysSinceBirth)} days since you were born, each day filled with moments to inspire.`,
+            `📅 That's ${num(yearsSinceBirth)} years, ${num(monthsSinceBirth)} months, ${num(weeksSinceBirth)} weeks, ${num(hoursSinceBirth)} hours, and ${num(minutesSinceBirth)} minutes!`,
+            `That was a lot of numbers to handle...`,
+            `Lucky you, you've got more coming!`,
+            `🌟 Since you were born,`,
+            `❤️ Your heart has beaten approximately ${num(daysSinceBirth * HEART_BEATS_PER_DAY)} times and pumped ${num(daysSinceBirth * BLOOD_PUMPED_PER_DAY)} liters of blood.`,
+            `Your body has produced ${num(daysSinceBirth * RED_BLOOD_CELLS_PER_DAY)} red blood cells 🧬`,
+            `😮‍💨 You've taken ${num(daysSinceBirth * BREATHS_PER_DAY)} breaths.`,
+            `👀 You've blinked your eyes ${num(daysSinceBirth * BLINKS_PER_DAY)} times.`,
+            `😴 You've spent ${num(Math.floor((daysSinceBirth * SLEEP_HOURS_PER_DAY) / 24))} days sleeping.`,
+            `You've scrolled through thousands of Instagram Reels by now.`,
+            `You're not the only thing that's changed.`,
+            `The world is a different place too 🌍`,
+            `👫 Humanity has welcomed ${num(Math.floor(yearsSinceBirth * BIRTHS_PER_YEAR))} new lives into the world.`,
+            `💵 $1.00 Dollar that time is equivalent to $${num(((1 + 0.03) ** yearsSinceBirth).toFixed(2))} today.`,
+            `🌌 During this time, the universe has been expanding,`,
+            `Your life has been in constant movement 🏃‍♂️`,
+            `You've travelled ${num(Math.floor(daysSinceBirth * 24 * EARTH_ORBIT_SPEED))} kms around the Sun 🌞`,
+            `🌕 The moon has orbited you ${num(Math.floor(daysSinceBirth / 27.32))} times in your lifetime.`,
+            `🌱 The world has grown greener with ${num(Math.floor(yearsSinceBirth * TREES_PER_YEAR))} trees planted.`,
+            `🔥 Remember, you are a unique part of this incredible story.`,
+            `⏳ The journey is long, and every step you take adds to your story.`,
+            `🌟 There will be challenges, but know that you are capable of overcoming them.`,
+            `💪 Never forget, you are unstoppable.`,
+            `Keep shining, keep thriving! Until next time 👋`,
+            `THE END`
+        ];
+
+        // Type the first line
+        storyText.classList.add('visible');
+        await typeText(storyText, storyLines[0]);
+        
+        // Fade in/out the rest of the lines
+        for (let i = 1; i < storyLines.length; i++) {
+            await fadeInOut(storyText, storyLines[i]);
+        }
+    }
+
+    async function showFullscreenInstructions() {
+            const fullscreenText = document.getElementById('fullscreenText');
+            fullscreenText.innerHTML = `
+                F11 = Full Screen Mode<br>
+                &<br>
+                Esc = Cancel<br><br>
+                Relax & Enjoy 🍿
+            `;
+            fullscreenText.classList.add('visible');
+            await new Promise(resolve => setTimeout(resolve, 5000));
+            fullscreenText.classList.remove('visible');
+            await new Promise(resolve => setTimeout(resolve, 800));
+        }
+
+        document.getElementById('goButton').addEventListener('click', () => {
+        const day = parseInt(inputs.day.value);
+        const month = parseInt(inputs.month.value);
+        const year = parseInt(inputs.year.value);
+
+        if (!day || day < 1 || day > 31 || 
+            !month || month < 1 || month > 12 || 
+            !year || year < 1900 || year > 2100) {
+            alert('Please enter a valid date.');
+            return;
+        }
+
+        const birthDate = new Date(year, month - 1, day);
+        if (isNaN(birthDate.getTime())) {
+            alert('The date you entered is invalid.');
+            return;
+        }
+
+        // Fade out input container
+        document.getElementById('inputContainer').classList.add('fade-out');
+
+        // Show headphones text after input fades
+        setTimeout(() => {
+            document.getElementById('experienceText').classList.add('visible');
+            // Show start button after 3 seconds
+            setTimeout(() => {
+                document.getElementById('startButton').classList.add('visible');
+            }, 3000);
+        }, 1000);
+    });
+
+    // Updated start button click handler
+    document.getElementById('startButton').addEventListener('click', async () => {
+        // Instantly remove headphones text and start button
+        document.getElementById('experienceText').style.display = 'none';
+        document.getElementById('startButton').style.display = 'none';
+
+        // Small delay before showing fullscreen instructions
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // Show fullscreen instructions
+        await showFullscreenInstructions();
+
+        // Start music and story
+        const music = document.getElementById('backgroundMusic');
+        music.volume = 0.7;
+        music.play().catch(error => console.log('Audio playback failed:', error));
+
+        // Start the story animation
+        const day = parseInt(inputs.day.value);
+        const month = parseInt(inputs.month.value);
+        const year = parseInt(inputs.year.value);
+        const birthDate = new Date(year, month - 1, day);
+        startStoryAnimation(birthDate);
+    });
+</script>
+</body>
+</html>
